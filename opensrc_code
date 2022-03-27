@@ -1,5 +1,4 @@
 #include <Wire.h>
-//#include <MechaQMC5883.h>
 #include<TinyGPS++.h>
 #include<SoftwareSerial.h>
 #include "MPU9250.h"
@@ -8,6 +7,7 @@ float latc,logc;
 float latd=22.555355,logd=72.915869;
 float bearing;
 float heading;
+float headingDegrees;
 
 const int rp = 10;
 const int rn = 11;
@@ -16,7 +16,6 @@ const int ln = 9;
 
 SoftwareSerial GPS_SoftSerial(2,3);
 TinyGPSPlus gps;
-//MechaQMC5883 qmc;
 int status;
 MPU9250 IMU(Wire,0x68);
 
@@ -206,7 +205,7 @@ void compass() {
   IMU.readSensor();
   // display the data
   
-  float heading;
+  heading;
   float magX ;
   float magY;
   float magZ;
@@ -227,7 +226,7 @@ void compass() {
     heading -= 2 * PI;
   }
   // Convert to degrees
-  float headingDegrees = heading * 180/M_PI; 
+  headingDegrees = heading * 180/M_PI; 
   
  
   
@@ -247,7 +246,6 @@ void compass() {
   //Serial.print("Temperature in C: ");
   //Serial.println(IMU.getTemperature_C(),6);
   //Serial.println();
-  delay(100);
 } 
 
 void loop() 
