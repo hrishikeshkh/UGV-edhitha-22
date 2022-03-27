@@ -44,7 +44,7 @@ double lat_gap = 110567;
 long double tolerance = 0.00000904428;
 
 //tolerance for angle in degrees
-double ang_tolerance = 2.5;
+double ang_tolerance = 5;
 
 //this is a delay parameter, sets gap between corrective movements, unit : seconds
 double n = 3;
@@ -210,16 +210,17 @@ void turn_till_facing(double dest_angle_func, double current_heading_func_ang)
     //turn by a small amount 
     if (dest_angle_func - current_heading_func_ang < 0)
   {
-    left(2000);
+    left(20);
   }
     else
   {
-    right(2000);
+    right(20);
   }
   
    if (fabs(dest_angle_func - current_heading_func_ang) < ang_tolerance)
     {
     facing = 1;
+    break;
     }
   }
 }
@@ -398,17 +399,6 @@ void setup()
 
   pinMode(LED_BUILTIN, OUTPUT);
   
-  //get current coordinates
-  while (true)
-  {
-  Coordinate_pair c1;
-  c1 = get_coordinate();
-  if (c1.latitude != 0 && c1.longitude != 0)
-  {
-    break;
-    digitalWrite(LED_BUILTIN, HIGH); 
-  }
-  }
   //wait for coordinates to be updated
   
   Coordinate_pair c1;
