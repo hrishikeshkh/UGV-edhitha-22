@@ -420,13 +420,35 @@ void setup()
 
   //turn till horizontal
   while (true)
-  {
-    right(20);
-    delay(200);
-    double current_header = get_current_heading();
-    if (fabs(current_header - 90) < ang_tolerance)
+  { 
+    //get current coordinates
+    Coordinate_pair c; 
+
+    //check if left or right of destination
+    c = get_coordinate();
+    double current_latitude = c.latitude;
+    double current_longitude = c.longitude;
+    if (current_latitude > destination_latitude)
     {
-      break;
+      //turn left
+      left(20);
+      delay(200);
+      double current_header = get_current_heading();
+      if (fabs(current_header + 90) < ang_tolerance)
+      {
+        break;
+      }
+    }
+    else
+    {
+      //turn right
+      right(20);
+      delay(200);
+      double current_header = get_current_heading();
+      if (fabs(current_header - 90) < ang_tolerance)
+      {
+        break;
+      }
     }
   }
 
@@ -444,6 +466,36 @@ void setup()
   //turn till vertical
   while (true)
   {
+    //get current coordinates
+    Coordinate_pair c;
+    c = get_coordinate();
+    double current_latitude = c.latitude;
+    double current_longitude = c.longitude;
+
+    //check if above or below of destination
+    if (current_latitude > destination_latitude)
+    {
+      //turn left
+      left(20);
+      delay(200);
+      double current_header = get_current_heading();
+      if (fabs(current_header - 180) < ang_tolerance)
+      {
+        break;
+      }
+    }
+    else
+    {
+      //turn right
+      right(20);
+      delay(200);
+      double current_header = get_current_heading();
+      if (fabs(current_header - 0) < ang_tolerance)
+      {
+        break;
+      }
+    }
+
     left(20);
     delay(200);
     double current_header = get_current_heading();
@@ -471,17 +523,4 @@ void setup()
 void loop()
 {
   //get coordinates
-  double current_latitude = get_coordinate().latitude;
-  double current_longitude = get_coordinate().longitude;
-
-  if (fabs(current_latitude - destination_longitude) < tolerance && fabs(current_longitude - destination_longitude) < tolerance)
-  {
-    stop_motor();
-  }
-  else
-  {
-    forward(-1);
-  }
-
-  corrective_measures();
 }
