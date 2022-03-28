@@ -30,8 +30,8 @@ const int m2p2=11;
 // SUPER IMP keep all units in SI
 
 //get destination coordinates
-double destination_latitude = 0;
-double destination_longitude = 0;
+double destination_latitude = 13.0312559;
+double destination_longitude = 77.5655982;
 
 //keep these 2 in same units keep in m 
 double ugv_breadth = 10;
@@ -44,7 +44,7 @@ double lat_gap = 110567;
 long double tolerance = 0.00000904428;
 
 //tolerance for angle in degrees
-double ang_tolerance = 5;
+double ang_tolerance = 2;
 
 //this is a delay parameter, sets gap between corrective movements, unit : seconds
 double n = 3;
