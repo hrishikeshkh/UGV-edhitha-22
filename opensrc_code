@@ -4,7 +4,7 @@
 #include "MPU9250.h"
 
 float latc,logc;
-float latd=22.555355,logd=72.915869;
+float latd= 13.0312559, logd= 77.5655982;
 float bearing;
 float heading;
 float headingDegrees;
