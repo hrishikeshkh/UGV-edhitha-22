@@ -9,10 +9,10 @@ float bearing;
 float heading;
 float headingDegrees;
 
-const int rp = 10;
-const int rn = 11;
-const int lp = 8;
-const int ln = 9;
+const int rp = 8;
+const int rn = 12;
+const int lp = 11;
+const int ln = 10;
 
 SoftwareSerial GPS_SoftSerial(2,3);
 TinyGPSPlus gps;
