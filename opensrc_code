@@ -64,15 +64,15 @@ void gpsdata()
   }
   else
   {
-   // Serial.println("GPS READING: ");
-   // DegMinSec(lat_val);
-  //  Serial.print("Latitude in Decimal Degrees : ");
-   // Serial.println(lat_val, 6);
+   Serial.println("GPS READING: ");
+   DegMinSec(lat_val);
+   Serial.print("Latitude in Decimal Degrees : ");
+   Serial.println(lat_val, 6);
 
-    //DegMinSec(lng_val); 
-    //Serial.print("Longitude in Decimal Degrees : ");
-    //Serial.println(lng_val, 6);
-    delay(100);
+   DegMinSec(lng_val); 
+   Serial.print("Longitude in Decimal Degrees : ");
+   Serial.println(lng_val, 6);
+   delay(100);
   }
 
   latc=lat_val;
