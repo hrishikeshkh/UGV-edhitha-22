@@ -31,37 +31,7 @@ double n = 3;
 //rpm estimate, update this value with real world as regularly as possible
 double rpm = 100;
 
-//old motor functions for servo, find the new ones below this
-
-// void stop()
-// {
-//   s1.writeMicroseconds(1500);
-//   s2.writeMicroseconds(1500);
-// }
-
-// void backward(double duration){
-//   s1.writeMicroseconds(1000);
-//   s2.writeMicroseconds(2000);
-//   if(duration!=-1) delay(duration);
-// }
-
-// void forward(double duration){
-//   s1.writeMicroseconds(2000);
-//   s2.writeMicroseconds(1000);
-//   if(duration!=-1) delay(duration);
-// }
-
-// void right(double duration){
-//   s1.writeMicroseconds(1500);
-//   s2.writeMicroseconds(1000);
-//   if(duration!=-1) delay(duration);
-// }
-
-// void left(double duration){
-//   s1.writeMicroseconds(2000);
-//   s2.writeMicroseconds(1500);
-//   if(duration!=-1) delay(duration);
-// }
+//motor functions
 
 void forward(int duration)
 {
@@ -118,7 +88,7 @@ double get_rpm()
   double new_longitude = get_coordinate().longitude;
 
   //calculate heading
-  double current_slope = (new_longitude - current_longitude)/ (new_latitude - current_latitude);
+  double current_slope = (new_latitude - current_latitude)/(new_longitude - current_longitude);
 
   backward(2000);
 
@@ -135,7 +105,7 @@ double get_rpm()
   new_longitude = get_coordinate().longitude;
 
   //calculate heading
-  double slope_upon_turning = (new_longitude - current_longitude)/ (new_latitude - current_latitude);
+  double slope_upon_turning = (new_latitude - current_latitude)/(new_longitude - current_longitude);
 
   backward(2000);
 
@@ -178,6 +148,13 @@ double* get_coordinate()
   //Coordinate_pair coordinates;
   coordinates_latitude = gps.location.lat();
   coordinates_longitude= gps.location.lng();
+
+  Serial.println("coordinates_latitude: ");
+  Serial.println(coordinates_latitude);
+
+  Serial.println("coordinates_longitude: ");
+  Serial.println(coordinates_longitude);
+
   double corr_arr[2] = {coordinates_latitude,coordinates_longitude};
   return corr_arr;
 }
@@ -200,9 +177,9 @@ void corrective_measures()
   double new_latitude = get_coordinate().latitude;
   double new_longitude = get_coordinate().longitude;
   
-  double current_slope = (new_longitude - current_longitude)/ (new_latitude - current_latitude);
+  double current_slope = (new_latitude - current_latitude)/(new_longitude - current_longitude);
 
-  double dest_slope = (dest_longitude - new_longitude)/ (dest_latitude - new_longitude);
+  double dest_slope = (dest_latitude - new_longitude)/(dest_longitude - new_longitude);
 
   if (fabs(current_slope - dest_slope) > tolerance)
   {
@@ -291,11 +268,14 @@ void setup()
   double new_latitude = cur_arr[0];
   double new_longitude = cur_arr[1];
 
-  double current_slope = (new_longitude - current_longitude)/ (new_latitude - current_latitude);
+  double current_slope = (new_latitude - current_latitude)/(new_longitude - current_longitude)/;
 
-  double dest_slope = (dest_longitude - new_longitude)/ (dest_latitude - new_longitude);
+  double dest_slope = (dest_latitude - new_longitude)/(dest_longitude - new_longitude)/ ;
 
   double req_ang = atan ((dest_slope - current_slope)/(1 + dest_slope * current_slope));
+
+  Serial.println("req_ang: ");
+  Serial.println(req_ang);
 
   turn_by_degrees(req_ang);
 }
