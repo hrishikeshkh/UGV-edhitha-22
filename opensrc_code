@@ -8,13 +8,17 @@ float latd= 13.0312559, logd= 77.5655982;
 float bearing;
 float heading;
 float headingDegrees;
-
+ 
 const int rp = 8;
 const int rn = 12;
 const int lp = 11;
 const int ln = 10;
 
-SoftwareSerial GPS_SoftSerial(2,3);
+int RXPin = 4;
+int TXPin = 3;
+int GPSBaud = 9600;
+
+SoftwareSerial GPS_SoftSerial(RXpin, TXpin);
 TinyGPSPlus gps;
 int status;
 MPU9250 IMU(Wire,0x68);
