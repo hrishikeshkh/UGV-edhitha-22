@@ -10,11 +10,18 @@ SoftwareSerial ss(4, 3);
 TinyGPSPlus gps;  
 SoftwareSerial gpsSerial(4, 3);
 
+//angle tolerence
+ang_tolerance = 5;
+
+//destination coordinates
+double destination_latitude = 13.031297;
+double destination_longitude = 77.565239;
+
 //these are pins for motors
 const int m1p1 = 11;
-const int m1p2=10;
-const int m2p1=8;
-const int m2p2=12;
+const int m1p2= 10;
+const int m2p1= 8;
+const int m2p2= 12;
 
 // SUPER IMP keep all units in SI
 
@@ -89,23 +96,27 @@ double get_rpm()
   double current_longitude = get_coordinate().longitude;
 
   forward(2000);
-
+  delay(1000);
   //get coordinates again 
   double new_latitude = get_coordinate().latitude;
   double new_longitude = get_coordinate().longitude;
 
   //calculate heading
   double current_slope = (new_latitude - current_latitude)/(new_longitude - current_longitude);
+  delay(1000);
 
   backward(2000);
 
   right(2000);
+
+  delay(1000);
 
   //get current coordinates
   current_latitude = get_coordinate().latitude;
   current_longitude = get_coordinate().longitude;
 
   forward(2000);
+  delay(1000);
 
   //get coordinates again 
   new_latitude = get_coordinate().latitude;
@@ -115,14 +126,16 @@ double get_rpm()
   double slope_upon_turning = (new_latitude - current_latitude)/(new_longitude - current_longitude);
 
   backward(2000);
+  delay(1000);
 
-  double angle_turned_by = atan ((slope_upon_turning - current_slope)/(1 + slope_upon_turning * current_slope));  
+  double angle_turned_by = atan((slope_upon_turning - current_slope)/(1 + (slope_upon_turning * current_slope)));  
 
-  double distance_turned_by = angle_turned_by * ugv_breadth * 3.1415 / 180;
+  double distance_turned_by = angle_turned_by * ugv_breadth;
 
   //speed of ugv in m/min
-  double speed_of_turning = distance_turned_by / (2 * 60);
+  double speed_of_turning = (distance_turned_by / 2) * 60;
 
+  //rpm of ugv
   double rpm = speed_of_turning/ (2 * 3.1415 * wheel_radius);
 
   return rpm;
@@ -174,9 +187,6 @@ Coordinate_pair get_coordinate()
 
 void corrective_measures()
 { 
-  //get destination coordinates
-  double dest_latitude = 0;
-  double dest_longitude = 0; 
 
   double req_ang;
   //get current coordinates
@@ -192,9 +202,9 @@ void corrective_measures()
   
   double current_slope = (new_latitude - current_latitude)/(new_longitude - current_longitude);
 
-  double dest_slope = (dest_latitude - new_latitude)/(dest_longitude - new_longitude);
+  double dest_slope = (destination_latitude - new_latitude)/(destination_longitude - new_longitude);
 
-  if (fabs(current_slope - dest_slope) > tolerance)
+  if (fabs(current_slope - dest_slope) > ang_tolerance)
   {
     req_ang = atan ((dest_slope - current_slope)/(1 + dest_slope * current_slope));
   }
@@ -216,14 +226,14 @@ void corrective_measures()
 
 void turn_by_degrees(double angle){
 
-  double turn_duration = (angle * ugv_breadth * 60) / (2 * 180 * wheel_radius * rpm);
+  double turn_duration = (angle * ugv_breadth * 60) / (2 * 3.1415 * wheel_radius * rpm);
   if (angle > 0)
   {
-    right(turn_duration);
+    right(turn_duration * 1000);
   }
   else
   {
-    left(turn_duration);
+    left(turn_duration * 1000);
   }
 }
 
@@ -247,6 +257,7 @@ void setup()
   delay(5000);
   Serial.begin(9600);
   ss.begin(9600);
+
   double rpm = get_rpm();
 
   //activate motor pins
@@ -264,9 +275,9 @@ void setup()
   // s1.attach(10);
 
   //get destination coordinates
-  double dest_latitude = 0;
-  double dest_longitude = 0;
-
+  double dest_latitude = 13.0312559;
+  double dest_longitude = 77.5655982;
+  delay(1000);
   //get current coordinates
   //double cur_arr[2];
   //cur_arr = get_coordinate();
@@ -276,7 +287,7 @@ void setup()
   //move forward func here with distance param
   forward(2000);
 
-
+  delay(1000);
   //get coordinates again 
   //double cur_arr[2] = get_coordinate();
   double new_latitude = get_coordinate().latitude;
@@ -284,14 +295,16 @@ void setup()
 
   double current_slope = (new_latitude - current_latitude)/(new_longitude - current_longitude);
 
-  double dest_slope = (dest_latitude - new_latitude)/(dest_longitude - new_longitude);
+  double dest_slope = (destination_latitude - new_latitude)/(destination_longitude - new_longitude);
 
-  double req_ang = atan ((dest_slope - current_slope)/(1 + dest_slope * current_slope));
+  double req_ang = atan((dest_slope - current_slope)/(1 + dest_slope * current_slope));
+  //TODO: check if req_ang is negative or positive
 
   Serial.println("req_ang: ");
   Serial.println(req_ang);
 
   turn_by_degrees(req_ang);
+  delay(2000);
 }
 
 void loop()
@@ -299,9 +312,6 @@ void loop()
   //get coordinates
   double current_latitude = get_coordinate().latitude;
   double current_longitude = get_coordinate().longitude;
-
-  double destination_latitude = 0;
-  double destination_longitude = 0;
   
   if (fabs(current_latitude - destination_latitude) < tolerance && fabs(current_longitude - destination_longitude) < tolerance)
   {
