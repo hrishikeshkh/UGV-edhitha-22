@@ -1,5 +1,8 @@
 #include <TinyGPS++.h>
 #include <SoftwareSerial.h>
+#include <MPU9250.h>
+#include <EEPROM.h>
+
 int RXPin = 4;
 int TXPin = 3;
 int GPSBaud = 9600;
