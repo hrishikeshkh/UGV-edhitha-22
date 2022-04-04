@@ -8,10 +8,10 @@ Servo s2;
 SoftwareSerial ss(4, 3);
 
 //these are pins for motors
-const int m1p1=8;
-const int m1p2=12;
-const int m2p1=10;
-const int m2p2=11;
+const int m1p1 = 11;
+const int m1p2=10;
+const int m2p1=8;
+const int m2p2=12;
 
 // SUPER IMP keep all units in SI
 
@@ -30,6 +30,10 @@ double n = 3;
 
 //rpm estimate, update this value with real world as regularly as possible
 double rpm = 100;
+
+typedef struct Coordinate_pair{
+  double latitude,longitude;
+}Coordinate_pair;
 
 //motor functions
 
@@ -136,27 +140,33 @@ double right_top_long = 0;
 
 //defining a new variable type with latitude and longitude
 
-typedef struct Coordinate_pair{
+/*struct Coordinate_pair{
   double latitude,longitude;
-} Coordinate_pair;
+}  Coordinate_pair;*/
 
-double coordinates_list[2];
 
-double* get_coordinate()
+/*struct Coordinate_pair{
+  double latitude;
+  double longitude;
+};*/
+
+Coordinate_pair get_coordinate()
 {
-  gps.encode(ss.read());
+   if (gps.encode(gpsSerial.read())){
+      if (gps.location.isValid()){
+    Serial.print("Latitude: ");
+    Serial.println(gps.location.lat(), 6);
+    Serial.print("Longitude: ");
+    Serial.println(gps.location.lng(), 6);
   //Coordinate_pair coordinates;
-  coordinates_latitude = gps.location.lat();
-  coordinates_longitude= gps.location.lng();
-
-  Serial.println("coordinates_latitude: ");
-  Serial.println(coordinates_latitude);
-
-  Serial.println("coordinates_longitude: ");
-  Serial.println(coordinates_longitude);
-
-  double corr_arr[2] = {coordinates_latitude,coordinates_longitude};
-  return corr_arr;
+  Coordinate_pair coor;
+  
+  coor.latitude = gps.location.lat();
+  coor.longitude= gps.location.lng();
+  
+  return coor;
+}
+}
 }
 
 void corrective_measures()
@@ -179,7 +189,7 @@ void corrective_measures()
   
   double current_slope = (new_latitude - current_latitude)/(new_longitude - current_longitude);
 
-  double dest_slope = (dest_latitude - new_longitude)/(dest_longitude - new_longitude);
+  double dest_slope = (dest_latitude - new_latitude)/(dest_longitude - new_longitude);
 
   if (fabs(current_slope - dest_slope) > tolerance)
   {
@@ -289,7 +299,7 @@ void loop()
   double destination_latitude = 0;
   double destination_longitude = 0;
   
-  if (fabs(current_latitude - destination_longitude) < tolerance && fabs(current_longitude - destination_longitude) < tolerance)
+  if (fabs(current_latitude - destination_latitude) < tolerance && fabs(current_longitude - destination_longitude) < tolerance)
   {
     stop_motor();
   }
