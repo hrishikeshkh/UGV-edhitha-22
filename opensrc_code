@@ -18,7 +18,7 @@ int RXPin = 4;
 int TXPin = 3;
 int GPSBaud = 9600;
 
-SoftwareSerial GPS_SoftSerial(RXpin, TXpin);
+SoftwareSerial GPS_SoftSerial(4, 3);
 TinyGPSPlus gps;
 int status;
 MPU9250 IMU(Wire,0x68);
