@@ -1,0 +1,258 @@
+#include <Wire.h>
+#include<TinyGPS++.h>
+#include<SoftwareSerial.h>
+#include "MPU9250.h"
+#include <EEPROM.h>
+float latc,logc;
+float latd= 13.0312559, logd= 77.5655982;
+float bearing;
+float heading;
+float headingDegrees;
+ 
+const int rp = 8;
+const int rn = 12;
+const int lp = 11;
+const int ln = 10;
+
+int RXPin = 4;
+int TXPin = 3;
+int GPSBaud = 9600;
+
+SoftwareSerial gpsSerial(4,3);
+TinyGPSPlus gps;
+int status;
+MPU9250 IMU(Wire,0x68);
+
+/* EEPROM buffer to mag bias and scale factors */
+uint8_t eeprom_buffer[24];
+float value;
+
+
+
+void setup() 
+{
+ pinMode(rp,OUTPUT);
+ pinMode(rn,OUTPUT);
+ pinMode(ln,OUTPUT);
+ pinMode(lp,OUTPUT);
+ Wire.begin();
+ Serial.begin(9600);
+ gpsSerial.begin(9600); 
+ 
+
+ status = IMU.begin();
+  if (status < 0) {
+    Serial.println("IMU initialization unsuccessful");
+    Serial.println("Check IMU wiring or try cycling power");
+    Serial.print("Status: ");
+    Serial.println(status);
+    while(1) {}
+  }
+  
+  Serial.print("Calibrating magnetometer, please slowly move in a figure 8 until complete...");
+  IMU.calibrateMag();
+  Serial.println("Done!");
+  Serial.print("Saving results to EEPROM...");
+  /* Save to EEPROM */
+  value = IMU.getMagBiasX_uT();
+  memcpy(eeprom_buffer, &value, sizeof(value));
+  value = IMU.getMagBiasY_uT();
+  memcpy(eeprom_buffer + 4, &value, sizeof(value));
+  value = IMU.getMagBiasZ_uT();
+  memcpy(eeprom_buffer + 8, &value, sizeof(value));
+  value = IMU.getMagScaleFactorX();
+  memcpy(eeprom_buffer + 12, &value, sizeof(value));
+  value = IMU.getMagScaleFactorY();
+  memcpy(eeprom_buffer + 16, &value, sizeof(value));
+  value = IMU.getMagScaleFactorZ();
+  memcpy(eeprom_buffer + 20, &value, sizeof(value));
+  for (unsigned int i = 0; i < sizeof(eeprom_buffer); i++) {
+    EEPROM.write(i, eeprom_buffer[i]);
+  }
+  Serial.println("Done! You may power off your board.");
+ 
+}
+
+//GPS:-
+void gpsdata(){
+while (gpsSerial.available() > 0){
+    if (gps.encode(gpsSerial.read())){
+      if (gps.location.isValid()){
+    Serial.print("Latitude: ");
+    Serial.println(gps.location.lat(), 6);
+    Serial.print("Longitude: ");
+    Serial.println(gps.location.lng(), 6);
+    }
+    }
+  latc=gps.location.lat();
+  logc=gps.location.lng();
+}
+}
+//GPS Heading:-
+void gpsheading()
+{
+  float x,y,deltalog,deltalat;
+  deltalog= logd-logc;
+  deltalat=latd-latc;
+
+  x=cos(latd)*sin(deltalog);
+  y=(cos(latc)*sin(latd))-(sin(latc)*cos(latd)*cos(deltalog));
+  
+  bearing=(atan2(x,y))*(180/3.14);
+  Serial.print("bearing");
+  Serial.println(bearing);
+
+  float a,d,c;
+  a=(((sin(deltalat/2)))*(sin(deltalat/2))) + ((cos(latc))*(cos(latd))* (((sin(deltalog/2)))*(sin(deltalog/2)))  );
+  c=2*(atan2(sqrt(a),sqrt(1-a)));
+  d=6371*c; 
+//Serial.println(d);
+}
+
+
+
+/*Heading:-
+void headingcal()
+{
+  int x,y,z;
+  qmc.read(&x,&y,&z);
+  delay(100);
+
+  heading=atan2(x, y)/0.0174532925;
+  if(heading < 0) 
+  {
+  heading+=360;
+  }
+  
+  heading=360-heading; // N=0/360, E=90, S=180, W=270
+  Serial.print("heading: ");
+   Serial.println(heading);  
+}*/
+
+//Motor:-
+
+void steering()
+{
+
+float finalv;
+finalv=heading/bearing;
+Serial.print("finalv: ");
+Serial.println(finalv);
+  
+if(finalv>=0&&finalv<=1)
+{
+  forward();
+}
+
+else if(finalv >1 && finalv <=8)
+{
+  left();
+}
+
+else if(finalv <=13 && finalv >=8)
+{
+  right();
+}
+
+else if(logd==logc && latc==latd)
+{
+  stop1();
+}
+}
+
+void forward()
+{
+  digitalWrite(rp,HIGH);
+  digitalWrite(rn,LOW);
+  digitalWrite(lp,HIGH);
+  digitalWrite(ln,LOW);
+}
+
+void right()
+{
+  digitalWrite(rp,HIGH);
+  digitalWrite(rn,LOW);
+  digitalWrite(lp,LOW);
+  digitalWrite(ln,HIGH);
+}
+
+void left()
+{
+  digitalWrite(rp,LOW);
+  digitalWrite(rn,HIGH);
+  digitalWrite(lp,HIGH);
+  digitalWrite(ln,LOW);
+}
+
+void back()
+{
+  digitalWrite(rn,HIGH);
+  digitalWrite(rp,LOW);
+  digitalWrite(ln,HIGH);
+  digitalWrite(lp,LOW);
+}
+void stop1()
+{
+  digitalWrite(rp,LOW);
+  digitalWrite(rn,LOW);
+  digitalWrite(lp,LOW);
+  digitalWrite(ln,LOW);
+}
+
+void compass() {
+  // read the sensor
+  IMU.readSensor();
+  // display the data
+  
+  heading;
+  float magX ;
+  float magY;
+  float magZ;
+  magX= (IMU.getMagX_uT());
+  magY= (IMU.getMagY_uT());
+  magZ= (IMU.getMagZ_uT());
+  heading = atan2(magY, magZ);
+  //Mag_x_offset = (magX_max + magX_min) / 2; 
+  //Mag_y_offset = (magY_max + magY_min) / 2;  
+  //Mag_z_offset = (magZ_max + magZ_min) / 2;
+  float declinationAngle = -0.0214;
+  heading += declinationAngle;
+  // Correct for heading < 0deg and heading > 360deg
+  if (heading < 0){
+    heading += 2 * PI;
+  }
+  if (heading > 2 * PI){
+    heading -= 2 * PI;
+  }
+  // Convert to degrees
+  headingDegrees = heading * 180/M_PI; 
+  
+ 
+  
+  //Serial.print("MagX: ");  
+  //Serial.print(magX, 6);
+  //Serial.print("\t");  
+  //Serial.print("MagY: ");
+  //Serial.print(magY, 6);
+  //Serial.print("\t");
+  //Serial.print("MagZ: ");  
+  //Serial.println(IMU.getMagZ_uT(),6);
+  Serial.print("Heading: ");
+  Serial.print(heading);
+  Serial.print("HeadingDegrees: " );
+  Serial.println((headingDegrees-120)*2);
+  
+  
+} 
+
+void loop() 
+{
+  compass();
+   delay(200);
+  gpsdata();
+  delay(200);
+  gpsheading();
+   delay(200);
+  steering();
+   delay(200);
+}
