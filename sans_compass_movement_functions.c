@@ -7,6 +7,9 @@ Servo s1;
 Servo s2;
 SoftwareSerial ss(4, 3);
 
+TinyGPSPlus gps;  
+SoftwareSerial gpsSerial(4, 3);
+
 //these are pins for motors
 const int m1p1 = 11;
 const int m1p2=10;
@@ -264,23 +267,23 @@ void setup()
   double dest_longitude = 0;
 
   //get current coordinates
-  double cur_arr[2];
-  cur_arr = get_coordinate();
-  double current_latitude = cur_arr[0];
-  double current_longitude = cur_arr[1];
+  //double cur_arr[2];
+  //cur_arr = get_coordinate();
+  double current_latitude = get_coordinate().latitude;
+  double current_longitude = get_coordinate().longitude;
 
   //move forward func here with distance param
   forward(2000);
 
 
   //get coordinates again 
-  double cur_arr[2] = get_coordinate();
-  double new_latitude = cur_arr[0];
-  double new_longitude = cur_arr[1];
+  //double cur_arr[2] = get_coordinate();
+  double new_latitude = get_coordinate().latitude;
+  double new_longitude = get_coordinate().longitude;
 
-  double current_slope = (new_latitude - current_latitude)/(new_longitude - current_longitude)/;
+  double current_slope = (new_latitude - current_latitude)/(new_longitude - current_longitude);
 
-  double dest_slope = (dest_latitude - new_longitude)/(dest_longitude - new_longitude)/ ;
+  double dest_slope = (dest_latitude - new_longitude)/(dest_longitude - new_longitude);
 
   double req_ang = atan ((dest_slope - current_slope)/(1 + dest_slope * current_slope));
 
