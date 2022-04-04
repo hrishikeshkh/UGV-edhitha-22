@@ -27,27 +27,7 @@ MPU9250 IMU(Wire,0x68);
 uint8_t eeprom_buffer[24];
 float value;
 
-Serial.print("Calibrating magnetometer, please slowly move in a figure 8 until complete...");
-  IMU.calibrateMag();
-  Serial.println("Done!");
-  Serial.print("Saving results to EEPROM...");
-  /* Save to EEPROM */
-  value = IMU.getMagBiasX_uT();
-  memcpy(eeprom_buffer, &value, sizeof(value));
-  value = IMU.getMagBiasY_uT();
-  memcpy(eeprom_buffer + 4, &value, sizeof(value));
-  value = IMU.getMagBiasZ_uT();
-  memcpy(eeprom_buffer + 8, &value, sizeof(value));
-  value = IMU.getMagScaleFactorX();
-  memcpy(eeprom_buffer + 12, &value, sizeof(value));
-  value = IMU.getMagScaleFactorY();
-  memcpy(eeprom_buffer + 16, &value, sizeof(value));
-  value = IMU.getMagScaleFactorZ();
-  memcpy(eeprom_buffer + 20, &value, sizeof(value));
-  for (unsigned int i = 0; i < sizeof(eeprom_buffer); i++) {
-    EEPROM.write(i, eeprom_buffer[i]);
-  }
-  Serial.println("Done! You may power off your board.");
+
 
 void setup() 
 {
@@ -68,6 +48,28 @@ void setup()
     Serial.println(status);
     while(1) {}
   }
+  
+  Serial.print("Calibrating magnetometer, please slowly move in a figure 8 until complete...");
+  IMU.calibrateMag();
+  Serial.println("Done!");
+  Serial.print("Saving results to EEPROM...");
+  /* Save to EEPROM */
+  value = IMU.getMagBiasX_uT();
+  memcpy(eeprom_buffer, &value, sizeof(value));
+  value = IMU.getMagBiasY_uT();
+  memcpy(eeprom_buffer + 4, &value, sizeof(value));
+  value = IMU.getMagBiasZ_uT();
+  memcpy(eeprom_buffer + 8, &value, sizeof(value));
+  value = IMU.getMagScaleFactorX();
+  memcpy(eeprom_buffer + 12, &value, sizeof(value));
+  value = IMU.getMagScaleFactorY();
+  memcpy(eeprom_buffer + 16, &value, sizeof(value));
+  value = IMU.getMagScaleFactorZ();
+  memcpy(eeprom_buffer + 20, &value, sizeof(value));
+  for (unsigned int i = 0; i < sizeof(eeprom_buffer); i++) {
+    EEPROM.write(i, eeprom_buffer[i]);
+  }
+  Serial.println("Done! You may power off your board.");
  
 }
 
