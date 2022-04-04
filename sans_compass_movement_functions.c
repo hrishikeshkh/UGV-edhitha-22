@@ -11,7 +11,7 @@ TinyGPSPlus gps;
 SoftwareSerial gpsSerial(4, 3);
 
 //angle tolerence
-ang_tolerance = 5;
+double ang_tolerance = 5;
 
 //destination coordinates
 double destination_latitude = 13.031297;
