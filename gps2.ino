@@ -3,11 +3,11 @@
 #include <MPU9250.h>
 #include <EEPROM.h>
 
-int RXPin = 4;
-int TXPin = 3;
+//int RXPin = 4;
+//int TXPin = 3;
 int GPSBaud = 9600;
 TinyGPSPlus gps;
-SoftwareSerial gpsSerial(RXPin, TXPin);
+SoftwareSerial gpsSerial(4, 3);
 void setup()
 {
   Serial.begin(9600);
