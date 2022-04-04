@@ -244,6 +244,7 @@ boolean is_in_boundary()
 
 void setup()
 {
+  delay(5000);
   Serial.begin(9600);
   ss.begin(9600);
   double rpm = get_rpm();
@@ -283,7 +284,7 @@ void setup()
 
   double current_slope = (new_latitude - current_latitude)/(new_longitude - current_longitude);
 
-  double dest_slope = (dest_latitude - new_longitude)/(dest_longitude - new_longitude);
+  double dest_slope = (dest_latitude - new_latitude)/(dest_longitude - new_longitude);
 
   double req_ang = atan ((dest_slope - current_slope)/(1 + dest_slope * current_slope));
 
@@ -305,6 +306,7 @@ void loop()
   if (fabs(current_latitude - destination_latitude) < tolerance && fabs(current_longitude - destination_longitude) < tolerance)
   {
     stop_motor();
+    digitalWrite(LED_BUILTIN, HIGH);
   }
   else
   {
