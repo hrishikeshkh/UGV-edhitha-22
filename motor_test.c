@@ -9,7 +9,10 @@ pinMode(8, OUTPUT);
 pinMode(12, OUTPUT);
 pinMode(10, OUTPUT);
 pinMode(11, OUTPUT);
-
+pinmode(21, OUTPUT);
+pinmode(22, OUTPUT);   
+pinmode(25, OUTPUT);
+pinmode(26, OUTPUT);
 }
 
 void loop() {
@@ -17,6 +20,8 @@ void loop() {
 
 // m1p1=forward, m1p2= backward m1 is the right motor
 //m2p1=backward,m2p2=forward  m2 is the left motor
+analogWrite(21,1);
+analogWrite(22,1);  
 forward(5000);
 delay(1000);
 backward(5000);
