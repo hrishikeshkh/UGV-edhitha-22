@@ -26,8 +26,8 @@ const int m2p2= 12;
 // SUPER IMP keep all units in SI
 
 //keep these 2 in same units keep in m 
-double ugv_breadth = 10;
-double wheel_radius = 10;
+double ugv_breadth = 0.185;
+double wheel_radius = 0.0529;
 
 //distance between each latitude in m 
 double lat_gap = 110567;
