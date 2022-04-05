@@ -129,13 +129,15 @@ void headingcal()
    Serial.println(heading);  
 }*/
 
+
+
 //Motor:-
 
 void steering()
 {
 
 float finalv;
-finalv=heading/bearing;
+finalv=headingDegrees/bearing;
 Serial.print("finalv: ");
 Serial.println(finalv);
   
