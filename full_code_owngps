@@ -129,6 +129,49 @@ void headingcal()
    Serial.println(heading);  
 }*/
 
+void compass() {
+  // read the sensor
+  IMU.readSensor();
+  // display the data
+  
+  heading;
+  float magX ;
+  float magY;
+  float magZ;
+  magX= (IMU.getMagX_uT());
+  magY= (IMU.getMagY_uT());
+  magZ= (IMU.getMagZ_uT());
+  heading = atan2(magY, magZ);
+  //Mag_x_offset = (magX_max + magX_min) / 2; 
+  //Mag_y_offset = (magY_max + magY_min) / 2;  
+  //Mag_z_offset = (magZ_max + magZ_min) / 2;
+  float declinationAngle = -0.0214;
+  heading += declinationAngle;
+  // Correct for heading < 0deg and heading > 360deg
+  if (heading < 0){
+    heading += 2 * PI;
+  }
+  if (heading > 2 * PI){
+    heading -= 2 * PI;
+  }
+  // Convert to degrees
+  headingDegrees = heading * 180/M_PI; 
+  
+ 
+  
+  //Serial.print("MagX: ");  
+  //Serial.print(magX, 6);
+  //Serial.print("\t");  
+  //Serial.print("MagY: ");
+  //Serial.print(magY, 6);
+  //Serial.print("\t");
+  //Serial.print("MagZ: ");  
+  //Serial.println(IMU.getMagZ_uT(),6);
+  Serial.print("Heading: ");
+  Serial.print(heading);
+  Serial.print("HeadingDegrees: " );
+  Serial.println((headingDegrees-120)*2);
+} 
 
 
 //Motor:-
