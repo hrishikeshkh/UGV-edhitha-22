@@ -227,6 +227,7 @@ void corrective_measures()
 void turn_by_degrees(double angle){
 
   double turn_duration = (angle * ugv_breadth * 60) / (2 * 3.1415 * wheel_radius * rpm);
+  
   if (angle > 0)
   {
     right(turn_duration * 1000);
