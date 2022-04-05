@@ -18,7 +18,7 @@ int RXPin = 4;
 int TXPin = 3;
 int GPSBaud = 9600;
 
-SoftwareSerial gpsSerial(4,3);
+SoftwareSerial gpsSerial(RXPIN, TXPIN);
 TinyGPSPlus gps;
 int status;
 MPU9250 IMU(Wire,0x68);
@@ -37,7 +37,7 @@ void setup()
  pinMode(lp,OUTPUT);
  Wire.begin();
  Serial.begin(9600);
- gpsSerial.begin(9600); 
+ gpsSerial.begin(GPSBAUD); 
  
 
  status = IMU.begin();
