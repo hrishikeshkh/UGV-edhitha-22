@@ -11,7 +11,7 @@ TinyGPSPlus gps;
 SoftwareSerial gpsSerial(4, 3);
 
 //angle tolerence
-ang_tolerance = 5;
+double ang_tolerance = 5;
 
 //destination coordinates
 double destination_latitude = 13.031297;
@@ -102,7 +102,7 @@ double get_rpm()
   double new_longitude = get_coordinate().longitude;
 
   //calculate heading
-  double current_slope = (new_latitude - current_latitude)/(new_longitude - current_longitude);
+  double current_ang = atan2((new_latitude - current_latitude), (new_longitude - current_longitude));
   delay(1000);
 
   backward(2000);
@@ -123,12 +123,12 @@ double get_rpm()
   new_longitude = get_coordinate().longitude;
 
   //calculate heading
-  double slope_upon_turning = (new_latitude - current_latitude)/(new_longitude - current_longitude);
+  double ang_upon_turning = atan2((new_latitude - current_latitude), (new_longitude - current_longitude));
 
   backward(2000);
   delay(1000);
 
-  double angle_turned_by = atan((slope_upon_turning - current_slope)/(1 + (slope_upon_turning * current_slope)));  
+  double angle_turned_by = fabs(ang_upon_turning - current_ang);  
 
   double distance_turned_by = angle_turned_by * ugv_breadth;
 
@@ -140,6 +140,30 @@ double get_rpm()
 
   return rpm;
 }
+
+// double true_angle(double current_latitude, double current_longitude, double new_latitude, double new_longitude)
+// {
+//   double current_slope = (new_latitude - current_latitude)/(new_longitude - current_longitude);
+//   double destination_slope = (destination_latitude - current_latitude)/(destination_longitude - current_longitude);
+//   double angle_turned_by = atan((destination_slope - current_slope)/(1 + (destination_slope * current_slope)));
+
+//   if (new_latitude - current_latitude > 0 && new_longitude - current_longitude > 0)
+//   {
+//     return angle_turned_by;
+//   }
+//   else if (new_latitude - current_latitude > 0 && new_longitude - current_longitude < 0)
+//   {
+//     return angle_turned_by + 3.1415;
+//   }
+//   else if (new_latitude - current_latitude < 0 && new_longitude - current_longitude < 0)
+//   {
+//     return angle_turned_by + 3.1415;
+//   }
+//   else if (new_latitude - current_latitude < 0 && new_longitude - current_longitude > 0)
+//   {
+//     return angle_turned_by + 3.1415;
+//   }
+// }
 
 //boundary points
 double left_bottom_lat = -1000;
@@ -200,13 +224,13 @@ void corrective_measures()
   double new_latitude = get_coordinate().latitude;
   double new_longitude = get_coordinate().longitude;
   
-  double current_slope = (new_latitude - current_latitude)/(new_longitude - current_longitude);
+  double current_ang = atan2((new_latitude - current_latitude), (new_longitude - current_longitude));
 
-  double dest_slope = (destination_latitude - new_latitude)/(destination_longitude - new_longitude);
+  double dest_ang = atan2((destination_latitude - new_latitude), (destination_longitude - new_longitude));
 
-  if (fabs(current_slope - dest_slope) > ang_tolerance)
+  if (fabs(current_ang - dest_ang) > ang_tolerance)
   {
-    req_ang = atan ((dest_slope - current_slope)/(1 + dest_slope * current_slope));
+    req_ang = dest_ang - current_ang;
   }
   else
   {
@@ -226,9 +250,9 @@ void corrective_measures()
 
 void turn_by_degrees(double angle){
 
-  double turn_duration = (angle * ugv_breadth * 60) / (2 * 3.1415 * wheel_radius * rpm);
+  double turn_duration = (fabs(angle) * ugv_breadth * 60) / (2 * 3.1415 * wheel_radius * rpm);
   
-  if (angle > 0)
+  if (angle < 0)
   {
     right(turn_duration * 1000);
   }
@@ -294,12 +318,11 @@ void setup()
   double new_latitude = get_coordinate().latitude;
   double new_longitude = get_coordinate().longitude;
 
-  double current_slope = (new_latitude - current_latitude)/(new_longitude - current_longitude);
+  double current_ang = atan2((new_latitude - current_latitude), (new_longitude - current_longitude));
 
-  double dest_slope = (destination_latitude - new_latitude)/(destination_longitude - new_longitude);
+  double dest_ang = atan2((destination_latitude - new_latitude), (destination_longitude - new_longitude));
 
-  double req_ang = atan((dest_slope - current_slope)/(1 + dest_slope * current_slope));
-  //TODO: check if req_ang is negative or positive
+  double req_ang = dest_ang - current_ang;
 
   Serial.println("req_ang: ");
   Serial.println(req_ang);
