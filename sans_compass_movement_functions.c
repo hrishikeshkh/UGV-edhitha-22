@@ -11,7 +11,7 @@ TinyGPSPlus gps;
 SoftwareSerial gpsSerial(4, 3);
 
 //angle tolerence
-double ang_tolerance = 5;
+ang_tolerance = 5;
 
 //destination coordinates
 double destination_latitude = 13.031297;
@@ -142,17 +142,17 @@ double get_rpm()
 }
 
 //boundary points
-double left_bottom_lat = 0;
-double left_bottom_long = 0;
+double left_bottom_lat = -1000;
+double left_bottom_long = -1000;
 
-double right_bottom_lat = 0;
-double right_bottom_long = 0;
+double right_bottom_lat = -1000;
+double right_bottom_long = 1000;
 
-double left_top_lat = 0;
-double left_top_long = 0;
+double left_top_lat = 1000;
+double left_top_long = -1000;
 
-double right_top_lat = 0;
-double right_top_long = 0;
+double right_top_lat = 1000;
+double right_top_long = 1000;
 
 //defining a new variable type with latitude and longitude
 
