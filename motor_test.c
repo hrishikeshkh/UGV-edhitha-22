@@ -1,7 +1,7 @@
 const int m1p1=8;
 const int m1p2=12;
-const int m2p1=10;
-const int m2p2=11;
+const int m2p1=11;
+const int m2p2=10;
 
 void setup() {
   // put your setup code here, to run once:
