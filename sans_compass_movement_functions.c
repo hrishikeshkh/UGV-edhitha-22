@@ -49,6 +49,7 @@ typedef struct Coordinate_pair{
 
 void forward(int duration)
 {
+  Serial.println('f');
   digitalWrite(m1p1,HIGH);
   digitalWrite(m1p2,LOW);
   digitalWrite(m2p1,LOW);
@@ -57,6 +58,7 @@ void forward(int duration)
 }
 void backward(int duration)
 {
+  Serial.println('b');
   digitalWrite(m1p1,LOW);
   digitalWrite(m1p2,HIGH);
   digitalWrite(m2p1,HIGH);
@@ -66,6 +68,7 @@ void backward(int duration)
 
 void right(int duration)
 {
+  Serial.println('r');
   digitalWrite(m1p1,LOW);
   digitalWrite(m1p2,LOW);
   digitalWrite(m2p1,LOW);
@@ -74,6 +77,7 @@ void right(int duration)
 }
 void left(int duration)
 {
+  Serial.println('l');
   digitalWrite(m1p1,HIGH);
   digitalWrite(m1p2,LOW);
   digitalWrite(m2p1,LOW);
@@ -81,12 +85,12 @@ void left(int duration)
   if (duration !=-1){delay(duration);}
 }
 void stop_motor()
-{
+{ 
+  Serial.println('stopped');
   digitalWrite(m1p1,LOW);
   digitalWrite(m1p2,LOW);
   digitalWrite(m2p1,LOW);
   digitalWrite(m2p2,LOW);
-  
 }
 
 double get_rpm()
@@ -137,7 +141,9 @@ double get_rpm()
 
   //rpm of ugv
   double rpm = speed_of_turning/ (2 * 3.1415 * wheel_radius);
-
+  
+  Serial.println('rpm');
+  Serial.println(rpm);
   return rpm;
 }
 
@@ -251,7 +257,9 @@ void corrective_measures()
 void turn_by_degrees(double angle){
 
   double turn_duration = (fabs(angle) * ugv_breadth * 60) / (2 * 3.1415 * wheel_radius * rpm);
-  
+  Serial.println('turn_duration');
+  Serial.println(turn_duration);
+
   if (angle < 0)
   {
     right(turn_duration * 1000);
@@ -260,6 +268,7 @@ void turn_by_degrees(double angle){
   {
     left(turn_duration * 1000);
   }
+
 }
 
 boolean is_in_boundary()
@@ -274,6 +283,7 @@ boolean is_in_boundary()
   else
   {
     return false;
+    Serial.println('is_not_in_boundary');
   }
 }
 
@@ -340,6 +350,7 @@ void loop()
   if (fabs(current_latitude - destination_latitude) < tolerance && fabs(current_longitude - destination_longitude) < tolerance)
   {
     stop_motor();
+    Serial.println('reached');
     digitalWrite(LED_BUILTIN, HIGH);
   }
   else
