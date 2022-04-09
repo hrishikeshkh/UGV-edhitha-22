@@ -372,7 +372,18 @@ void loop()
   //get coordinates
   double current_latitude = get_coordinate().latitude;
   double current_longitude = get_coordinate().longitude;
+
+  Serial.println("curr lat:");
+  Serial.println(current_latitude);
+
+  Serial.println("curr lon");
+  Serial.println(current_longitude);
   
+  Serial.println("lat del:");
+  //Serial.println(fabs(current_latitude - destination_latitude));
+
+  Serial.println("long del:");
+  //Serial.println(fabs(current_longitude - destination_longitude));
   if (fabs(current_latitude - destination_latitude) < tolerance && fabs(current_longitude - destination_longitude) < tolerance)
   {
     stop_motor();
