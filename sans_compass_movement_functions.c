@@ -1,17 +1,21 @@
 #include <math.h>
 #include <Servo.h>
-#include <TinyGPSPlus.h>
+#include <TinyGPS++.h>
 #include <SoftwareSerial.h>
 
 Servo s1;
 Servo s2;
-SoftwareSerial ss(4, 3);
 
-TinyGPSPlus gps;  
-SoftwareSerial gpsSerial(4, 3);
+int RXPin = 4;
+int TXPin = 3;
+TinyGPSPlus gps;
+SoftwareSerial gpsSerial(RXPin, TXPin);
 
 //angle tolerence
 double ang_tolerance = 5;
+
+//check if reached 
+bool reached = false;
 
 //destination coordinates
 double destination_latitude = 13.031297;
@@ -33,7 +37,7 @@ double wheel_radius = 0.0529;
 double lat_gap = 110567;
 
 //tolerance for distance in m 
-double tolerance = 0.00000904428;
+double tolerance = 0.0104428;
 
 //this is a delay parameter, sets gap between corrective movements, unit : seconds
 double n = 3;
@@ -49,7 +53,7 @@ typedef struct Coordinate_pair{
 
 void forward(int duration)
 {
-  Serial.println('f');
+  //Serial.println("f");
   digitalWrite(m1p1,HIGH);
   digitalWrite(m1p2,LOW);
   digitalWrite(m2p1,LOW);
@@ -58,7 +62,7 @@ void forward(int duration)
 }
 void backward(int duration)
 {
-  Serial.println('b');
+  //Serial.println("b");
   digitalWrite(m1p1,LOW);
   digitalWrite(m1p2,HIGH);
   digitalWrite(m2p1,HIGH);
@@ -68,7 +72,7 @@ void backward(int duration)
 
 void right(int duration)
 {
-  Serial.println('r');
+  //Serial.println("r");
   digitalWrite(m1p1,LOW);
   digitalWrite(m1p2,LOW);
   digitalWrite(m2p1,LOW);
@@ -77,7 +81,7 @@ void right(int duration)
 }
 void left(int duration)
 {
-  Serial.println('l');
+  //Serial.println("l");
   digitalWrite(m1p1,HIGH);
   digitalWrite(m1p2,LOW);
   digitalWrite(m2p1,LOW);
@@ -86,7 +90,7 @@ void left(int duration)
 }
 void stop_motor()
 { 
-  Serial.println('stopped');
+  //Serial.println("stopped");
   digitalWrite(m1p1,LOW);
   digitalWrite(m1p2,LOW);
   digitalWrite(m2p1,LOW);
@@ -142,7 +146,7 @@ double get_rpm()
   //rpm of ugv
   double rpm = speed_of_turning/ (2 * 3.1415 * wheel_radius);
   
-  Serial.println('rpm');
+  Serial.println("rpm");
   Serial.println(rpm);
   return rpm;
 }
@@ -197,22 +201,42 @@ double right_top_long = 1000;
 };*/
 
 Coordinate_pair get_coordinate()
-{
-   if (gps.encode(gpsSerial.read())){
+{ 
+  if (!reached){
+   if (gpsSerial.available() > 0){
+    //Serial.println("cond1");
+    if (gps.encode(gpsSerial.read())){
+    Serial.println("cond2");
       if (gps.location.isValid()){
+        Serial.println("cond3");
     Serial.print("Latitude: ");
     Serial.println(gps.location.lat(), 6);
     Serial.print("Longitude: ");
     Serial.println(gps.location.lng(), 6);
-  //Coordinate_pair coordinates;
-  Coordinate_pair coor;
-  
-  coor.latitude = gps.location.lat();
-  coor.longitude= gps.location.lng();
-  
-  return coor;
-}
-}
+    //Serial.println(gps.course.deg());
+
+    double curren_lat = gps.location.lat();
+    double curren_lon = gps.location.lng();
+
+    Coordinate_pair coor;
+    coor.latitude = curren_lat;
+    coor.longitude = curren_lon;
+
+    return coor;
+    }
+  /*double dest_lat=13.031297;
+  double dest_long=77.565239;
+  double distancem=TinyGPSPlus::distanceBetween(gps.location.lat(),gps.location.lng(),dest_lat,dest_long);
+  Serial.print(distancem);*/
+    }
+  }  
+  }
+
+ else
+ {
+  Serial.println("invalid");
+ }
+
 }
 
 void corrective_measures()
@@ -257,7 +281,7 @@ void corrective_measures()
 void turn_by_degrees(double angle){
 
   double turn_duration = (fabs(angle) * ugv_breadth * 60) / (2 * 3.1415 * wheel_radius * rpm);
-  Serial.println('turn_duration');
+  Serial.println("turn_duration");
   Serial.println(turn_duration);
 
   if (angle < 0)
@@ -283,15 +307,16 @@ boolean is_in_boundary()
   else
   {
     return false;
-    Serial.println('is_not_in_boundary');
+    Serial.println("is_not_in_boundary");
   }
 }
 
 void setup()
 {
+  gpsSerial.begin(9600);
   delay(5000);
   Serial.begin(9600);
-  ss.begin(9600);
+//  ss.begin(9600);
 
   double rpm = get_rpm();
 
@@ -316,6 +341,7 @@ void setup()
   //get current coordinates
   //double cur_arr[2];
   //cur_arr = get_coordinate();
+  Serial.println("coordinates go here");
   double current_latitude = get_coordinate().latitude;
   double current_longitude = get_coordinate().longitude;
 
@@ -350,13 +376,15 @@ void loop()
   if (fabs(current_latitude - destination_latitude) < tolerance && fabs(current_longitude - destination_longitude) < tolerance)
   {
     stop_motor();
-    Serial.println('reached');
+    Serial.println("reached");
     digitalWrite(LED_BUILTIN, HIGH);
+    reached = true;
+    exit(0);
   }
   else
   {
     forward(-1);
   }
 
-  corrective_measures();
+  //corrective_measures();
 }
