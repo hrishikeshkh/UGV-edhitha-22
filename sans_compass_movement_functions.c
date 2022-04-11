@@ -202,7 +202,6 @@ double right_top_long = 1000;
 
 Coordinate_pair get_coordinate()
 { 
-  if (!reached){
    if (gpsSerial.available() > 0){
     //Serial.println("cond1");
     if (gps.encode(gpsSerial.read())){
@@ -230,7 +229,7 @@ Coordinate_pair get_coordinate()
   Serial.print(distancem);*/
     }
   }  
-  }
+  
 
  else
  {
