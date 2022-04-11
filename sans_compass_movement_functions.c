@@ -45,6 +45,19 @@ double n = 3;
 //rpm estimate, update this value with real world as regularly as possible
 double rpm = 100;
 
+//boundary points
+double left_bottom_lat = -1000;
+double left_bottom_long = -1000;
+
+double right_bottom_lat = -1000;
+double right_bottom_long = 1000;
+
+double left_top_lat = 1000;
+double left_top_long = -1000;
+
+double right_top_lat = 1000;
+double right_top_long = 1000;
+
 typedef struct Coordinate_pair{
   double latitude,longitude;
 }Coordinate_pair;
@@ -95,6 +108,39 @@ void stop_motor()
   digitalWrite(m1p2,LOW);
   digitalWrite(m2p1,LOW);
   digitalWrite(m2p2,LOW);
+}
+
+
+Coordinate_pair get_coordinate()
+{ 
+   if (gpsSerial.available() > 0){
+    Serial.println("cond1");
+    if (gps.encode(gpsSerial.read())){
+    Serial.println("cond2");
+      if (gps.location.isValid()){
+        Serial.println("cond3");
+    Serial.print("Latitude: ");
+    Serial.println(gps.location.lat(), 6);
+    Serial.print("Longitude: ");
+    Serial.println(gps.location.lng(), 6);
+    //Serial.println(gps.course.deg());
+
+    double curren_lat = gps.location.lat();
+    double curren_lon = gps.location.lng();
+
+    Coordinate_pair coor;
+    coor.latitude = curren_lat;
+    coor.longitude = curren_lon;
+
+    return coor;
+    }
+    }
+  }  
+ else
+ {
+  Serial.println("invalid");
+ }
+
 }
 
 double get_rpm()
@@ -175,19 +221,6 @@ double get_rpm()
 //   }
 // }
 
-//boundary points
-double left_bottom_lat = -1000;
-double left_bottom_long = -1000;
-
-double right_bottom_lat = -1000;
-double right_bottom_long = 1000;
-
-double left_top_lat = 1000;
-double left_top_long = -1000;
-
-double right_top_lat = 1000;
-double right_top_long = 1000;
-
 //defining a new variable type with latitude and longitude
 
 /*struct Coordinate_pair{
@@ -200,43 +233,7 @@ double right_top_long = 1000;
   double longitude;
 };*/
 
-Coordinate_pair get_coordinate()
-{ 
-   if (gpsSerial.available() > 0){
-    //Serial.println("cond1");
-    if (gps.encode(gpsSerial.read())){
-    Serial.println("cond2");
-      if (gps.location.isValid()){
-        Serial.println("cond3");
-    Serial.print("Latitude: ");
-    Serial.println(gps.location.lat(), 6);
-    Serial.print("Longitude: ");
-    Serial.println(gps.location.lng(), 6);
-    //Serial.println(gps.course.deg());
 
-    double curren_lat = gps.location.lat();
-    double curren_lon = gps.location.lng();
-
-    Coordinate_pair coor;
-    coor.latitude = curren_lat;
-    coor.longitude = curren_lon;
-
-    return coor;
-    }
-  /*double dest_lat=13.031297;
-  double dest_long=77.565239;
-  double distancem=TinyGPSPlus::distanceBetween(gps.location.lat(),gps.location.lng(),dest_lat,dest_long);
-  Serial.print(distancem);*/
-    }
-  }  
-  
-
- else
- {
-  Serial.println("invalid");
- }
-
-}
 
 void corrective_measures()
 { 
