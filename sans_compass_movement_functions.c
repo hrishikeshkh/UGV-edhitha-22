@@ -113,44 +113,45 @@ void stop_motor()
 
 Coordinate_pair get_coordinate()
 { 
-   if (gpsSerial.available() > 0){
-    Serial.println("cond1");
+   while (gpsSerial.available() > 0){
+    //Serial.println("cond1");
     if (gps.encode(gpsSerial.read())){
-    Serial.println("cond2");
+    //Serial.println("cond2");
       if (gps.location.isValid()){
-        Serial.println("cond3");
-    Serial.print("Latitude: ");
-    Serial.println(gps.location.lat(), 6);
-    Serial.print("Longitude: ");
-    Serial.println(gps.location.lng(), 6);
+        //Serial.println("cond3");
+    //Serial.print("Latitude: ");
+    //Serial.println(gps.location.lat(), 6);
+    //Serial.print("Longitude: ");
+    //Serial.println(gps.location.lng(), 6);
     //Serial.println(gps.course.deg());
 
     double curren_lat = gps.location.lat();
     double curren_lon = gps.location.lng();
 
     Coordinate_pair coor;
+
     coor.latitude = curren_lat;
     coor.longitude = curren_lon;
 
-    return coor;
+   return coor;
     }
     }
   }  
- else
- {
-  Serial.println("invalid");
- }
-
 }
 
 double get_rpm()
 {
+  Serial.println("getting rpm");
   //get current coordinates
   double current_latitude = get_coordinate().latitude;
   double current_longitude = get_coordinate().longitude;
+  Serial.println("var coors");
+  Serial.println(current_latitude);
+  Serial.println(current_longitude);
 
   forward(2000);
   delay(1000);
+
   //get coordinates again 
   double new_latitude = get_coordinate().latitude;
   double new_longitude = get_coordinate().longitude;
@@ -340,6 +341,10 @@ void setup()
   Serial.println("coordinates go here");
   double current_latitude = get_coordinate().latitude;
   double current_longitude = get_coordinate().longitude;
+  Serial.println("var coors");
+  Serial.println(current_latitude);
+  Serial.println(current_longitude);
+
 
   //move forward func here with distance param
   forward(2000);
@@ -376,10 +381,11 @@ void loop()
   Serial.println(current_longitude);
   
   Serial.println("lat del:");
-  //Serial.println(fabs(current_latitude - destination_latitude));
+  Serial.println(fabs(current_latitude - destination_latitude));
 
   Serial.println("long del:");
-  //Serial.println(fabs(current_longitude - destination_longitude));
+  Serial.println(fabs(current_longitude - destination_longitude));
+  
   if (fabs(current_latitude - destination_latitude) < tolerance && fabs(current_longitude - destination_longitude) < tolerance)
   {
     stop_motor();
